@@ -3174,24 +3174,23 @@ class XianyuLive:
 
             # 1. 优先检查商品级别默认回复
             if item_id:
-                logger.info(f"【{self.cookie_id}】检查商品默认回复: item_id={item_id}")
+                logger.info(f"【{self.cookie_id}】检查商品默认回复: item_id={item_id}, cookie_id={self.cookie_id}")
                 item_default_reply = db_manager.get_item_default_reply(self.cookie_id, item_id)
                 logger.info(f"【{self.cookie_id}】商品默认回复查询结果: {item_default_reply}")
-                if item_default_reply and item_default_reply.get('enabled', False):
+                if item_default_reply and item_default_reply.get('reply_content', False):
                     reply_content = item_default_reply.get('reply_content', '')
-                    reply_image_url = item_default_reply.get('reply_image_url', '')
-                    
+
                     # 如果文字和图片都为空，返回空回复标记
-                    if (not reply_content or reply_content.strip() == '') and (not reply_image_url or reply_image_url.strip() == ''):
+                    if (not reply_content or reply_content.strip() == '') and (True):
                         logger.info(f"【{self.cookie_id}】商品 {item_id} 默认回复内容和图片都为空，不进行回复")
                         return "EMPTY_REPLY"
-                    
+
                     # 检查"只回复一次"功能（商品级别）
-                    if item_default_reply.get('reply_once', False) and chat_id:
+                    if True and chat_id:
                         if db_manager.has_default_reply_record(self.cookie_id, chat_id, item_id):
                             logger.info(f"【{self.cookie_id}】商品 {item_id} 已对用户 {chat_id} 回复过，跳过（只回复一次）")
                             return "ALREADY_REPLIED"
-                    
+
                     # 进行变量替换
                     formatted_reply = ''
                     if reply_content and reply_content.strip():
@@ -3205,14 +3204,14 @@ class XianyuLive:
                         except Exception as format_error:
                             logger.error(f"商品默认回复变量替换失败: {self._safe_str(format_error)}")
                             formatted_reply = reply_content
-                    
+
                     # 如果开启了"只回复一次"功能，记录这次回复（商品级别）
-                    if item_default_reply.get('reply_once', False) and chat_id:
+                    if True and chat_id:
                         db_manager.add_default_reply_record(self.cookie_id, chat_id, item_id)
                         logger.info(f"【{self.cookie_id}】记录商品默认回复: item_id={item_id}, chat_id={chat_id}")
-                    
-                    logger.info(f"【{self.cookie_id}】使用商品默认回复: 商品ID={item_id}, 文字={formatted_reply}, 图片={reply_image_url}")
-                    return {'text': formatted_reply, 'image_url': reply_image_url if reply_image_url and reply_image_url.strip() else None}
+
+                    logger.info(f"【{self.cookie_id}】使用商品默认回复: 商品ID={item_id}, 文字={formatted_reply}")
+                    return {'text': formatted_reply}
 
             # 2. 获取账号级别的默认回复设置
             default_reply_settings = db_manager.get_default_reply(self.cookie_id)
