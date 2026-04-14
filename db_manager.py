@@ -2014,9 +2014,16 @@ class DBManager:
                 cursor = self.conn.cursor()
                 if item_id:
                     cursor.execute('''
-                    SELECT enabled, reply_content, reply_once, reply_image_url, item_id FROM default_replies 
+                    SELECT reply_content, item_id FROM item_replay
                     WHERE cookie_id = ? AND item_id = ?
                     ''', (cookie_id, item_id))
+                    result = cursor.fetchone()
+                    if result:
+                        reply_content, item_id_val = result
+                        return {
+                            'reply_content': reply_content or '',
+                            'item_id': item_id_val
+                        }
                 else:
                     cursor.execute('''
                     SELECT enabled, reply_content, reply_once, reply_image_url, item_id FROM default_replies 
